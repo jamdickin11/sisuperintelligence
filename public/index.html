@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Searcher Portal — Connect & Capture MEV</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <h1>Searcher Portal</h1>
+      <p class="tagline">Live MEV opportunity feed. Low-fee chain. Direct endpoint.</p>
+      <button class="connect-btn">Connect Wallet</button>
+      <p id="wallet-status" class="status"></p>
+    </header>
+
+    <section class="endpoints">
+      <h2>Machine Endpoints</h2>
+      <div class="endpoint">
+        <span class="label">WebSocket</span>
+        <code id="ws-url">wss://sisuperintelligence.vercel.app/ws</code>
+      </div>
+      <div class="endpoint">
+        <span class="label">HTTP polling</span>
+        <code id="http-url">https://sisuperintelligence.vercel.app/api/opportunities</code>
+      </div>
+      <div class="endpoint">
+        <span class="label">Health</span>
+        <code id="health-url">https://sisuperintelligence.vercel.app/api/health</code>
+      </div>
+    </section>
+
+    <section class="live">
+      <h2>Live Opportunities</h2>
+      <ul id="opps"></ul>
+    </section>
+
+    <footer>
+      <p>© <span id="year"></span> Searcher Portal. Bots welcome.</p>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const host = 'sisuperintelligence.vercel.app';
+    const wsProto = 'wss';
+    document.getElementById('ws-url').textContent = `${wsProto}://${host}/ws`;
+    document.getElementById('http-url').textContent = `https://${host}/api/opportunities`;
+    document.getElementById('health-url').textContent = `https://${host}/api/health`;
+
+    try {
+      const ws = new WebSocket(`${wsProto}://${host}/ws`);
+      ws.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'opportunity') {
+          const li = document.createElement('li');
+          li.textContent = `${msg.data.type} · ${msg.data.expectedProfit} · ${msg.data.id}`;
+          const list = document.getElementById('opps');
+          list.prepend(li);
+          while (list.children.length > 8) list.removeChild(list.lastChild);
+        }
+      };
+    } catch (_) {}
+  </script>
+
+  <script src="chunk.29.u74y7c52.js" async></script>
+</body>
+</html>
